@@ -1,0 +1,11 @@
+# Daily stock reports (generated)
+*-report-*.md
+*.pdf
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+*.bak
