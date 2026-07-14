@@ -13,7 +13,7 @@
 
 > 请帮我安装 daily-stock-report skill。
 >
-> 仓库地址：https://github.com/<your-username>/daily-stock-report.git
+> 仓库地址：https://github.com/henryjhq/daily-stock-report.git
 >
 > 1. 判断你自己是什么 agent：
 >    - Claude Code → 克隆到 ~/.claude/skills/daily-stock-report/
