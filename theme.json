@@ -1,0 +1,37 @@
+{
+  "name": "ink-blue",
+  "background": "#f0f4ff",
+  "surface": "#e8edf8",
+  "surfaceBorder": "#d0d8e8",
+  "textPrimary": "#0f172a",
+  "textBody": "#334155",
+  "textMuted": "#64748b",
+  "accent": "#1e40af",
+  "accentLight": "#dbeafe",
+  "gain": "#16a34a",
+  "loss": "#dc2626",
+  "warn": "#f59e0b",
+  "warnLight": "#fffbeb",
+  "dividerStyle": "thick",
+  "headerAccent": "bar",
+  "tableStripe": true,
+  "cardShadow": true,
+  "fontSize": "normal",
+  "aiDecorations": true,
+  "decorationPrompt": "frosted matte glass texture on very light pale blue background, subtle grain noise, soft paper-like tactile feel, matte finish, seamless tileable, elegant premium stationery texture, 10% visible, no text, no sharp lines, pure abstract surface material",
+  "imageApi": {
+    "provider": "seedream",
+    "endpoint": "https://ark.cn-beijing.volces.com/api/v3/images/generations",
+    "model": "doubao-seedream-5-0-pro-260628",
+    "apiKey": "YOUR_API_KEY_HERE",
+    "headers": {
+      "Authorization": "Bearer {{apiKey}}",
+      "Content-Type": "application/json"
+    },
+    "size": "1024x1024",
+    "responseFormat": "b64_json",
+    "extraBody": {
+      "watermark": false
+    }
+  }
+}

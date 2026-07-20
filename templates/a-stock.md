@@ -22,7 +22,15 @@ Columns: 指数 | 收盘 | 涨跌 | 涨跌幅
 
 One-line driver per index.
 
-### 2. Market Microstructure 📈
+### 2. 指数近一月走势
+**chart: kline** (fallback: chart: line)
+
+四大指数（上证综指、深证成指、创业板指、科创50）过去约 15-20 个交易日的 OHLC K 线图，
+叠加 5 日均线。每个指数独立 SVG 卡片（价格区间差异较大）。
+
+K 线颜色：红涨绿跌（A 股习惯），或统一绿涨红跌。如 OHLC 数据不足，退化为折线图。
+
+### 3. Market Microstructure 📈
 **chart: flow**
 
 Key microstructure data as a flow comparison chart:
@@ -30,14 +38,14 @@ Key microstructure data as a flow comparison chart:
 - Northbound flow (北向资金): net inflow/outflow
 - Limit-up / limit-down count (涨停/跌停家数)
 
-### 3. Sector & Concept Rotation 🔄
+### 4. Sector & Concept Rotation 🔄
 **chart: bar**
 
 CSS bar chart: top 5 Shenwan sectors (green) and bottom 5 (red).
 
 Prose on leading/lagging sectors and hot concepts (AI, new energy, semiconductor, SOE reform).
 
-### 4. Policy & Macro 📡
+### 5. Policy & Macro 📡
 **chart: none**
 
 China macro and policy signals (prose only):
@@ -46,7 +54,7 @@ China macro and policy signals (prose only):
 - RMB fixing and CNH/CNY movement
 - 10Y CGB yield direction
 
-### 5. What to Watch ⏳
+### 6. What to Watch ⏳
 **chart: none**
 
 2-3 concrete events (prose only):

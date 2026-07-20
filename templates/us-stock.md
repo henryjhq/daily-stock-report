@@ -3,58 +3,116 @@
 ## Report Header
 
 ```
-# 🇺🇸 US Stock Market Daily Report — {{DATE}}
+# 美股市场日报 -- {{DATE}}
 ```
 
-> **Data as of:** market close {{DATE}} · Sources: WebSearch
-> **Indices:** S&P 500 · NASDAQ Composite · Dow Jones Industrial Average
+> 报告日期：{{GEN_DATE}} | 行情数据：{{DATE}} 收盘 | 数据来源：网络实时搜索
 
 ---
 
 ## Sections
 
-### 1. Index Snapshot 📊
+### 1. 三大指数概览
 **chart: table**
 
-Report the day's performance for all three major indices in a styled table.
-Red/green color coding: green for gains, red for losses.
+当日三大指数收盘数据，红涨绿跌标注。
 
-Columns: Index | Close | Change | % Change
+表格列：指数名称 | 收盘点位 | 涨跌点 | 涨跌幅
 
-One-line driver for each index (e.g., "tech rallied on AI earnings").
+每个指数配一句驱动因素说明（如"银行财报推动金融板块创新高"）。
 
-### 2. Top Movers 🚀
+### 2. 指数近一月走势
+**chart: kline** (fallback: chart: line)
+
+三大指数过去约 15-20 个交易日的 OHLC K 线图（蜡烛图），叠加 5 日均线。
+每个指数独立 SVG 卡片。K 线颜色：绿涨红跌。
+
+- S&P 500：K 线 + MA5 + 涨跌幅总结
+- NASDAQ 综合指数：K 线 + MA5 + 涨跌幅总结
+- 道琼斯工业指数：K 线 + MA5 + 涨跌幅总结
+
+如 OHLC 数据不足，退化为折线图 (chart: line)。
+
+### 3. 纳斯达克深度分析
+**chart: none**
+
+仅针对纳斯达克综合指数的深度拆解，包含四个维度：
+
+**走势分析：** 当日分时走势特征（高开/低开/震荡/尾盘拉升等），与前一交易日对比。
+**板块贡献：** 纳指内部领涨/领跌板块，哪些板块贡献最大正/负点数。
+**明星个股：** 2-3 只对纳指影响最大的成分股，含涨跌幅和驱动事件。
+**市场情绪：** 结合 VIX、涨跌比、成交量等指标判断当日情绪（积极/中性/谨慎/恐慌）。
+
+### 4. 涨跌幅最大个股
 **chart: table**
 
-3-5 stocks that moved the most today in a table.
-Columns: Ticker | Price | Change % | Reason (one sentence)
+5 只日内波动最大的知名股票。
 
-Prioritize well-known names.
+表格列：代码 | 最新价 | 涨跌幅 | 涨跌原因（一句话）
 
-### 3. Sector Rotation 🔄
+优先选取市值大、知名度高的公司。涨跌幅用红绿色标注。
+
+### 5. 五大维度涨跌归因
+**chart: table**
+
+从五个维度系统分析当日市场涨跌原因，每个维度 1-2 句：
+
+| 维度 | 今日判断 | 依据 |
+|---|---|---|
+| 政策面 | 利好/中性/利空 | 具体政策或官员表态 |
+| 资金面 | 流入/平衡/流出 | 成交量、资金流向、北向/南向 |
+| 情绪面 | 乐观/中性/恐慌 | VIX、涨跌比、避险资产动向 |
+| 技术面 | 支撑/压力/震荡 | 关键均线、支撑位/阻力位 |
+| 基本面 | 改善/平稳/恶化 | 财报、经济数据、盈利预期 |
+
+### 6. 板块轮动
 **chart: bar**
 
-Top 5 gaining GICS sectors as green bars, bottom 5 losing sectors as red bars.
-CSS bar chart: `.bar-fill.up` for leaders, `.bar-fill.down` for laggards.
+CSS 柱状图展示板块强弱对比。
 
-Mention 1-2 sentences on what's driving the rotation.
+- 领涨板块：前 5 个涨幅最大的 GICS 板块，绿色柱，宽度按百分比换算
+- 领跌板块：前 5 个跌幅最大的 GICS 板块，红色柱，宽度按百分比换算
 
-### 4. Macro Pulse 📡
+附 2-3 句轮动逻辑分析（资金从哪流向哪、背后的宏观或事件驱动）。
+
+### 7. 宏观环境
 **chart: none**
 
-Key macro signals (prose only):
-- Treasury yields (2Y, 10Y) — direction
-- US Dollar Index (DXY) — direction
-- VIX — level and direction
-- Fed speak or data releases
+关键宏观信号（纯文字段落）：
 
-### 5. What to Watch ⏳
+- 国债收益率（2 年期、10 年期）-- 方向和含义
+- 美元指数（DXY）-- 方向和含义
+- VIX 恐慌指数 -- 水平和方向
+- 美联储动态 -- 官员讲话、利率预期
+- 地缘政治事件
+
+### 8. 今日关注前瞻
 **chart: none**
 
-2-3 concrete events for the next trading day (prose only):
-- Earnings reports after close / before open
-- Economic data releases
-- Technical levels (S&P 500 support/resistance)
+下一交易日的 2-3 个具体事件：
+
+- 盘后/盘前重要财报
+- 经济数据发布（初请失业金、制造业指数、零售销售等）
+- 关键技术位（标普 500 支撑/阻力）
+- 地缘政治事件进展
+
+### 9. 今日知识点
+**chart: none**
+
+每天提供两条知识点，帮助读者逐步建立投资知识体系：
+
+**金融知识：** 一个金融专业概念的解释（如"什么是核心 PCE""美联储如何决定利率""VIX 的计算方法"等）。每周聚焦一个知识领域。
+
+**股市知识：** 一个股市实操相关的知识点（如"什么是盘中回调""如何读懂财报摘要""板块轮动的规律"等）。与当日报内容关联。
+
+每条知识控制在 3-5 句话，通俗易懂。标注所属知识领域和编号，方便追踪。
+
+### 10. 自选股追踪（如有）
+**chart: table**
+
+仅当 watchlist.md 中该市场下有未注释条目时才生成此板块。
+
+表格列：代码 | 最新价 | 当日涨跌 | 近期关键事件
 
 ---
 
@@ -63,3 +121,18 @@ Key macro signals (prose only):
 ```
 | {{YYYY-MM-DD}} | S&P 500 {{change%}} | {{top mover ticker}} {{%}} | {{5-word theme}} |
 ```
+
+## Knowledge Tracker Entry Format
+
+```
+| {{YYYY-MM-DD}} | 金融: {{topic}} (#{{N}}) | 股市: {{topic}} (#{{M}}) |
+```
+
+知识领域轮换表（每 4 周一个循环）：
+
+| 周次 | 金融知识方向 | 股市知识方向 |
+|---|---|---|
+| 第 1 周 | 宏观经济指标 (CPI/PCE/GDP/PMI) | 大盘分析基础 (指数/成交量/技术位) |
+| 第 2 周 | 货币政策工具 (利率/准备金/公开市场操作) | 板块轮动 (行业分类/轮动规律/产业链) |
+| 第 3 周 | 固定收益 (国债/企业债/收益率曲线) | 个股分析 (财报/估值/技术指标) |
+| 第 4 周 | 衍生品 (期货/期权/波动率) | 资金面 (北向/融资融券/机构持仓) |
