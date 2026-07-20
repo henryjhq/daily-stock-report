@@ -24,10 +24,12 @@ fi
 
 SKIP_RENDER=false
 SKIP_CONFIG=false
+SKIP_REPORT=false
 for arg in "$@"; do
   case "$arg" in
     --skip-render) SKIP_RENDER=true ;;
     --skip-config) SKIP_CONFIG=true ;;
+    --skip-report) SKIP_REPORT=true ;;
   esac
 done
 
@@ -84,7 +86,7 @@ else
 fi
 
 # ── 4. 文件完整性 ──
-run_test "4/4  文件完整性" "
+run_test "4/5  文件完整性" "
   echo '  Required files:' &&
   for f in SKILL.md theme.json VERSION README.md watchlist.md setup.sh \
            templates/us-stock.md templates/hk-stock.md templates/a-stock.md templates/generic.md \
@@ -97,6 +99,18 @@ run_test "4/4  文件完整性" "
     fi
   done
 "
+
+# ── 5. 报告质量检查 (如果有上次生成的报告) ──
+if [ "$SKIP_REPORT" = false ]; then
+  LATEST_REPORT=$(find ../reports/daily-stock -name "us-report-*.html" -type f 2>/dev/null | sort -r | head -1)
+  if [ -n "$LATEST_REPORT" ] && [ -f "$LATEST_REPORT" ]; then
+    run_test "5/5  报告质量检查 ($(basename "$LATEST_REPORT"))" "$PYTHON tests/check_report.py \"$LATEST_REPORT\""
+  else
+    echo -e "${CYAN}  [SKIP] No existing report to check${NC}"
+  fi
+else
+  echo -e "${CYAN}  [SKIP] 报告质量检查${NC}"
+fi
 
 # ── 结果汇总 ──
 TOTAL=$((PASS + FAIL))

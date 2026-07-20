@@ -1,0 +1,33 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:      # 允许手动触发
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Playwright
+        run: |
+          pip install playwright
+          playwright install chromium --with-deps
+
+      - name: Run config & template checks
+        run: python tests/check_config.py
+
+      - name: Run render pipeline test
+        run: python tests/check_render.py
+
+      - name: Quick shell tests
+        run: bash tests/run_all.sh --skip-config --skip-render
