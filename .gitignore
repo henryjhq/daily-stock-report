@@ -9,3 +9,6 @@ Thumbs.db
 # Temp
 *.tmp
 *.bak
+
+# Test output
+tests/output/

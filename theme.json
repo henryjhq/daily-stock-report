@@ -8,8 +8,8 @@
   "textMuted": "#64748b",
   "accent": "#1e40af",
   "accentLight": "#dbeafe",
-  "gain": "#16a34a",
-  "loss": "#dc2626",
+  "gain": "#dc2626",
+  "loss": "#16a34a",
   "warn": "#f59e0b",
   "warnLight": "#fffbeb",
   "dividerStyle": "thick",
@@ -17,6 +17,7 @@
   "tableStripe": true,
   "cardShadow": true,
   "fontSize": "normal",
+  "outputDir": ".",
   "aiDecorations": true,
   "decorationPrompt": "frosted matte glass texture on very light pale blue background, subtle grain noise, soft paper-like tactile feel, matte finish, seamless tileable, elegant premium stationery texture, 10% visible, no text, no sharp lines, pure abstract surface material",
   "imageApi": {

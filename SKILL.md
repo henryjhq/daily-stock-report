@@ -80,8 +80,9 @@ font-family: "Microsoft YaHei", "SimHei", "PingFang SC", "Hiragino Sans GB", san
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: "Microsoft YaHei", "SimHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
-  color: #334155; background: #ffffff; max-width: 800px;
+  color: #334155; background: #ffffff; max-width: 860px;
   margin: 0 auto; padding: 48px 40px; line-height: 1.8;
+  /* wider body (860px) gives K-line charts more room when stacked vertically */
   /* AI-generated background texture (4% opacity, barely visible when printed) */
   background-image: url('../assets/decorations/bg-texture.png');
   background-repeat: repeat;
@@ -136,10 +137,15 @@ strong { color: #0f172a; }
 
 /* ===== Line & K-line charts (SVG) ===== */
 .line-section, .kline-section { margin: 20px 0; }
-.line-charts-grid, .kline-charts-grid { display: flex; flex-wrap: wrap; gap: 16px; margin: 16px 0; }
-.line-chart-card, .kline-chart-card { flex: 1; min-width: 220px; background: #f8fafc;
-                                      border: 1px solid #e2e8f0; border-radius: 8px;
-                                      padding: 14px 12px 8px 12px; }
+.line-charts-grid { display: flex; flex-wrap: wrap; gap: 16px; margin: 16px 0; }
+.line-chart-card { flex: 1; min-width: 220px; background: #f8fafc;
+                   border: 1px solid #e2e8f0; border-radius: 8px;
+                   padding: 14px 12px 8px 12px; }
+/* K-line charts: vertical stack (one per row) for larger, more readable candles */
+.kline-charts-grid { display: flex; flex-direction: column; gap: 20px; margin: 16px 0; }
+.kline-chart-card { width: 100%; background: #f8fafc;
+                    border: 1px solid #e2e8f0; border-radius: 8px;
+                    padding: 14px 12px 8px 12px; }
 .line-chart-card .chart-title, .kline-chart-card .chart-title { font-size: 14px;
     font-weight: 700; color: #0f172a; margin-bottom: 2px; text-align: center; }
 .line-chart-card .chart-subtitle, .kline-chart-card .chart-subtitle { font-size: 11px;
@@ -182,6 +188,22 @@ strong { color: #0f172a; }
 /* ===== Page layout ===== */
 .page-break { page-break-before: always; }
 hr { border: none; border-top: 1px solid #e2e8f0; margin: 40px 0 16px 0; }
+
+/* ===== PDF page-break control ===== */
+/* Prevent content from breaking in the middle of key blocks.
+   Essential for clean PDF output via Playwright/wkhtmltopdf. */
+h2 { page-break-before: auto; page-break-after: avoid; }
+h3 { page-break-after: avoid; }
+.data-table { page-break-inside: avoid; }
+.kline-chart-card { page-break-inside: avoid; }
+.knowledge-card { page-break-inside: avoid; }
+.callout { page-break-inside: avoid; }
+.metric-row { page-break-inside: avoid; }
+.summary-box { page-break-inside: avoid; }
+.pull-quote { page-break-inside: avoid; }
+.bar-section { page-break-inside: avoid; }
+ul { page-break-inside: avoid; }
+.report-header { page-break-after: avoid; }
 
 /* ===== Footer ===== */
 .report-footer { margin-top: 48px; padding-top: 16px;
@@ -656,6 +678,9 @@ Refer to `trackers/knowledge-tracker.md` to find the last topic covered, then pi
 - Connection to current market context when possible
 
 ### Phase 3 -- PDF Output & Record
+
+**Output location: Save all generated files (HTML and PDF) to the user's current
+working directory (the folder they have open), NOT the skill directory.**
 
 **Step 1: Ensure Playwright + Chromium are available.**
 
