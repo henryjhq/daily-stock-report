@@ -215,7 +215,6 @@ daily-stock-report/
 ├── INSTALL.md
 ├── setup.sh
 ├── watchlist.md                   # 自选股列表
-├── codebuddy/SKILL.md             # Codebuddy 入口
 ├── templates/                     # 4 个市场模板
 │   ├── us-stock.md                # 美股（10 板块）
 │   ├── hk-stock.md                # 港股
