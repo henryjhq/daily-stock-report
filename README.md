@@ -1,4 +1,4 @@
-# daily-stock-report v3.0
+# daily-stock-report v1.4
 
 一句话：给 AI 助手发一段话，每天自动出股票报告。**K 线图 + 主题定制 + AI 纹理 + 自动质检**，PDF 输出。
 
@@ -11,7 +11,7 @@
 
 | 功能 | 说明 |
 |---|---|
-| **K 线图** | OHLC 蜡烛图 + MA5 均线，matplotlib 渲染，自动识别涨跌 |
+| **K 线图** | OHLC 蜡烛图 + MA5 均线，内嵌 SVG 渲染，自动识别涨跌 |
 | **5 套主题** | default-light / warm-cream / cool-slate / ink-blue / dark，一键切换 |
 | **AI 背景纹理** | Seedream / DALL-E / Stability 自动生成报告背景纹理，磨砂/纸张质感 |
 | **图片 API 入口** | 首次使用主动询问配置，支持任意图片生成 API，改 3 个字段即可切换 |
@@ -95,14 +95,14 @@ vim theme.json   # 支持: default-light | warm-cream | cool-slate | ink-blue | 
 
 ---
 
-## 报告内容（v3.0）
+## 报告内容
 
 每份 PDF 报告含 10 个板块：
 
 | # | 板块 | 类型 | 说明 |
 |---|---|---|---|
 | 一 | 三大指数概览 | CSS 数据表 + 卡片 | 红涨绿跌，带驱动分析 |
-| 二 | 指数近一月走势 | K 线图 / 折线图 | OHLC 蜡烛 + MA5，matplotlib PNG |
+| 二 | 指数近一月走势 | K 线图 / 折线图 | OHLC 蜡烛 + MA5，内嵌 SVG |
 | 三 | 纳斯达克深度分析 | 纯文字 | 走势/板块贡献/明星股/情绪 |
 | 四 | 涨跌幅最大个股 | 数据表 | 5 只，涨跌原因 |
 | 五 | 五大维度涨跌归因 | 判定表 + 徽章 | 政策/资金/情绪/技术/基本面 |
@@ -114,10 +114,10 @@ vim theme.json   # 支持: default-light | warm-cream | cool-slate | ink-blue | 
 
 ### 视觉亮点
 
-- **顶部渐变摘要条** — 今日核心：芯片熊市 | VIX 18.77 | 资金轮动
-- **8 种颜色标记** — 红(跌/利空)、绿(涨/利好)、蓝(日期/概率)、琥珀(油价/异常)、紫(洞察)
-- **五维归因徽章** — 利空/净流出/偏恐慌 等带框标识
 - **AI 背景纹理** — 磨砂纸张质感或几何纹路，极淡叠底，打印后不抢眼但比纯白有质感
+- **K 线图竖向堆叠** — 每张图独占一行，蜡烛清晰可辨
+- **指标卡片** — 关键宏观数据（收益率/VIX/DXY/油价）以卡片展示
+- **引语金句** — 每日核心洞察以居中醒目文字呈现
 
 ---
 
@@ -165,7 +165,7 @@ python tests/check_report.py <报告.html>   # 单独检查某份报告
 
 ```
 数据采集 (WebSearch)
-  → HTML 生成 (CSS + SVG + matplotlib PNG)
+  → HTML 生成 (内嵌 CSS + 内嵌 SVG)
   → 报告质检 (tests/check_report.py)
   → PDF 渲染 (Playwright Chromium)
   → 输出 + 追踪器更新
@@ -176,7 +176,7 @@ python tests/check_report.py <报告.html>   # 单独检查某份报告
 | 组件 | 技术 |
 |---|---|
 | AI 引擎 | Claude Code / Codex / Codebuddy (Agent Skills 标准) |
-| 图表生成 | matplotlib (K线/折线) + CSS (柱状图) |
+| 图表生成 | 内嵌 SVG (K线/折线) + CSS (柱状图) |
 | PDF 渲染 | Playwright + Chromium (默认) / wkhtmltopdf (降级) |
 | 图片生成 | Seedream 5.0 Pro / DALL-E 3 / Stability AI (可选) |
 | 字体 | Microsoft YaHei / SimHei / PingFang SC |
@@ -186,11 +186,12 @@ python tests/check_report.py <报告.html>   # 单独检查某份报告
 
 | 角色 | 色值 | 用途 |
 |---|---|---|
-| 涨绿 | `#16a34a` | 涨幅、利好、阳线 |
-| 跌红 | `#dc2626` | 跌幅、利空、阴线 |
+| 涨红 | `#dc2626` | 涨幅、利好 |
+| 跌绿 | `#16a34a` | 跌幅、利空 |
+| 涨幅红 | `#dc2626` | 阳线 (close >= open) |
+| 跌幅绿 | `#16a34a` | 阴线 (close < open) |
 | 强调蓝 | `#1e40af` (默认) | 标题、分隔线、卡片边框 |
-| 警告琥珀 | `#f59e0b` | 异常数据、油价、VIX 警戒 |
-| 洞察紫 | `#7c3aed` | 图表解读、额外洞察 |
+| 警告琥珀 | `#f59e0b` | 异常数据、油价、VIX 警戒，MA5 均线 |
 
 ---
 
@@ -207,9 +208,9 @@ cd ~/.claude/skills/daily-stock-report
 
 ```
 daily-stock-report/
-├── SKILL.md                       # Skill 主文件 (1070+ 行)
+├── SKILL.md                       # Skill 主文件
 ├── theme.json                     # 主题 + 图片 API 配置
-├── VERSION                        # 3.0.0
+├── VERSION                        # 1.4
 ├── README.md
 ├── INSTALL.md
 ├── setup.sh
@@ -220,13 +221,12 @@ daily-stock-report/
 │   ├── hk-stock.md                # 港股
 │   ├── a-stock.md                 # A股
 │   └── generic.md                 # 通用 / 加密货币
-├── trackers/                      # 知识追踪（5 个文件）
+├── trackers/                      # 知识追踪
 ├── tests/                         # 测试套件
 │   ├── run_all.sh                 # 一键测试入口
 │   ├── check_config.py            # 配置 & 模板校验
 │   ├── check_render.py            # HTML→PDF 渲染链路
-│   └── check_report.py            # 报告质量检查（乱码/格式/完整性）
-├── assets/decorations/            # AI 生成的装饰素材
+│   └── check_report.py            # 报告质量检查
 └── .github/workflows/
     └── test.yml                   # GitHub Actions CI
 ```
