@@ -1,18 +1,25 @@
-# daily-stock-report v2.0
+# daily-stock-report v1.5
 
 一句话：给 AI 助手发一段话，每天自动出股票报告。含图表 + 知识卡片，PDF 输出。
 
 支持三个 AI 编程助手：Claude Code · Codex · Codebuddy
 覆盖四个市场：美股 · 港股 · A股 · 通用 / 加密货币
 
-新功能：
-- 8+1 板块完整日报
-- 全中文界面（修复 wkhtmltopdf emoji 乱码）
-- 每日金融 + 股市知识点，4 周轮换体系
-- 纳斯达克深度分析 + 五大维度涨跌归因
-- 自选股自动追踪
+> 版本说明：本版本号由 v2.0 更名为 **v1.5**。此前将一次体验升级误标为 v2.0（重大版本），
+> 经复核本次更新为向下兼容的功能增强，并非破坏性改动，故统一回落到 v1.x 线。
 
----
+## v1.5 新特性（相对 v1.0.0）
+
+| 特性 | 说明 |
+|---|---|
+| **主题定制系统** | `theme.json` 一键切换 5 套主题（default-light / warm-cream / cool-slate / ink-blue / dark），可自定义颜色、字体大小、斑马纹、卡片阴影 |
+| **红涨绿跌规范** | gain/loss 颜色全局强制映射，可适配 A股「红涨绿跌」与美股「绿涨红跌」两种习惯 |
+| **K线图渲染** | 新增 `chart: kline`，OHLC 蜡烛图 + 5 日均线，覆盖四大市场 |
+| **Playwright 渲染器** | 弃用 wkhtmltopdf（QtWebKit 老引擎），改用 Chromium，完整支持现代 CSS / SVG / 背景纹理 |
+| **AI 装饰元素** | 接入 Seedream / DALL-E / Stability 图片 API，自动生成报告背景纹理 |
+| **每日定时任务** | `theme.json` 的 `schedule` 配置，按市场 / 时间 / 工作日自动生成 |
+| **自动化测试** | `tests/` 提供配置检查、渲染检查、报告结构检查脚本 |
+| **排版一致性** | 模板固化标准版式（指标卡 + 卡片概览 + K线图），确保每日报告排版统一 |
 
 ## 安装
 
@@ -31,8 +38,6 @@
 > 4. 装好之后告诉我
 
 详细安装说明见 [INSTALL.md](INSTALL.md)。
-
----
 
 ## 使用
 
@@ -59,27 +64,28 @@
 
 ### 每日定时
 
-```
+```bash
 /cron "0 18 * * 1-5" /daily-stock-report 美股   # 工作日 6 PM 自动出美股报告
 ```
 
----
+也可编辑 `theme.json` 的 `schedule` 字段（`enabled` / `market` / `time` / `days`）开启内置定时任务。
 
-## 报告内容（v2.0）
+## 报告内容
 
-每份 PDF 报告含 9 个板块：
+每份 PDF 报告含 10 个板块：
 
 | # | 板块 | 类型 |
 |---|---|---|
-| 一 | 三大指数概览 | CSS 数据表 |
-| 二 | 纳斯达克深度分析 | 走势/板块/明星股/情绪 |
-| 三 | 涨跌幅最大个股 | 5 只 + 涨跌原因 |
-| 四 | 五大维度涨跌归因 | 政策/资金/情绪/技术/基本面 |
-| 五 | 板块轮动 | CSS 柱状图（5 涨 5 跌） |
-| 六 | 宏观环境 | 国债/VIX/DXY/Fed/地缘 |
-| 七 | 今日关注前瞻 | 财报/数据/技术位 |
-| 八 | 今日知识点 | 金融概念 + 股市实操，4 周轮换 |
-| 九 | 自选股追踪（可选） | watchlist.md 驱动 |
+| 一 | 三大指数概览 | 指标卡 + 卡片概览 + 明细表 |
+| 二 | 指数近一月K线图 | SVG 蜡烛图（OHLC + 5 日均线） |
+| 三 | 纳斯达克深度分析 | 走势/板块/明星股/情绪 |
+| 四 | 涨跌幅最大个股 | 5 只 + 涨跌原因 |
+| 五 | 五大维度涨跌归因 | 政策/资金/情绪/技术/基本面 |
+| 六 | 板块轮动 | CSS 柱状图（5 涨 5 跌） |
+| 七 | 宏观环境 | 国债/VIX/DXY/Fed/地缘 |
+| 八 | 今日关注前瞻 | 财报/数据/技术位 |
+| 九 | 今日知识点 | 金融概念 + 股市实操，4 周轮换 |
+| 十 | 自选股追踪（可选） | watchlist.md 驱动 |
 
 ## 知识体系
 
@@ -92,13 +98,21 @@
 | 第 3 周 | 固定收益 | 个股分析 |
 | 第 4 周 | 衍生品 | 资金面 |
 
+## 主题定制
+
+编辑 `theme.json` 即可自定义报告外观：
+
+- **预设主题**：`default-light` / `warm-cream` / `cool-slate` / `ink-blue` / `dark`
+- **涨跌颜色**：`gain`（涨）/ `loss`（跌），默认「红涨绿跌」（涨 `#dc2626` / 跌 `#16a34a`）
+- **AI 装饰**：`aiDecorations: true` + 配置 `imageApi`，自动生成背景纹理
+
+> 注意：`imageApi.apiKey` 若填入真实密钥，请勿提交到仓库。
+
 ## 技术说明
 
-- wkhtmltopdf 使用 QtWebKit，不支持 emoji 和 Unicode 符号（会显示空白）
-- 报告 HTML 已做全中文适配，字体栈为 Windows / macOS 中文系统字体
-- 颜色规范：涨绿 #16a34a / 跌红 #dc2626
-
----
+- PDF 由 Playwright + Chromium 渲染，支持现代 CSS、SVG 图表与背景纹理
+- 报告 HTML 全中文适配，字体栈为 Windows / macOS 中文系统字体
+- 颜色规范：涨红 `#dc2626` / 跌绿 `#16a34a`（可经 `theme.json` 反转）
 
 ## 更新
 
@@ -107,8 +121,6 @@ cd ~/.claude/skills/daily-stock-report
 ./setup.sh --update
 ```
 
----
-
 ## 文件结构
 
 ```
@@ -116,18 +128,23 @@ daily-stock-report/
 ├── SKILL.md                       # Claude Code / Codex 入口
 ├── codebuddy/SKILL.md             # Codebuddy 入口
 ├── templates/                     # 4 个市场模板（含 chart 标签）
-│   ├── us-stock.md                # 美股（9 板块结构）
+│   ├── us-stock.md                # 美股（10 板块结构 + 排版规范）
 │   ├── hk-stock.md                # 港股
 │   ├── a-stock.md                 # A股
 │   └── generic.md                 # 通用 / 加密货币
-├── trackers/                      # 追踪文件
+├── trackers/                      # 追踪文件（追加式知识日志）
 │   ├── us-stock-tracker.md
 │   ├── hk-stock-tracker.md
 │   ├── a-stock-tracker.md
 │   ├── generic-tracker.md
 │   └── knowledge-tracker.md       # 知识进度追踪
+├── theme.json                     # 主题 + 定时任务 + 图片 API 配置
+├── SCHEDULE.md                    # 定时任务说明
 ├── watchlist.md                   # 自选股列表
+├── assets/                        # 装饰资源（背景纹理）
+├── tests/                         # 自动化测试脚本
 ├── setup.sh                       # 一键安装 / 更新
+├── CHANGELOG.md                   # 更新日志
 ├── VERSION
 └── README.md
 ```

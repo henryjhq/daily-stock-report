@@ -2,6 +2,10 @@
 *-report-*.md
 *.pdf
 
+# Generated report artifacts
+output/
+report_*.html
+
 # OS
 .DS_Store
 Thumbs.db
