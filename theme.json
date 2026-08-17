@@ -20,6 +20,13 @@
   "outputDir": ".",
   "aiDecorations": true,
   "decorationPrompt": "frosted matte glass texture on very light pale blue background, subtle grain noise, soft paper-like tactile feel, matte finish, seamless tileable, elegant premium stationery texture, 10% visible, no text, no sharp lines, pure abstract surface material",
+  "schedule": {
+    "enabled": false,
+    "market": "us-stock",
+    "time": "08:00",
+    "days": "1-5",
+    "_comment": "定时任务配置。设 enabled=true 并在此文件中保存后，系统会在指定时间自动生成日报。market: us-stock | hk-stock | a-stock。time: HH:MM 北京时间。days: 1-5=工作日, 1-7=每天, 1,3,5=周一三五。修改后在下一次对话输入 /daily-stock-report schedule:setup 使其生效。"
+  },
   "imageApi": {
     "provider": "seedream",
     "endpoint": "https://ark.cn-beijing.volces.com/api/v3/images/generations",

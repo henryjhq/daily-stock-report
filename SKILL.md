@@ -66,8 +66,57 @@ Use the theme values to populate all CSS. The colors below are the
 - Surface border: `#e2e8f0`
 - Text primary: `#0f172a` | Text body: `#334155` | Text muted: `#64748b`
 - Accent: `#2563eb` | Accent light: `#eff6ff`
-- Gain green: `#16a34a` | Loss red: `#dc2626`
+- Gain: `#16a34a` | Loss: `#dc2626`
 - Warn: `#f59e0b` | Warn light: `#fffbeb`
+
+## CRITICAL: Theme Color Enforcement (MUST FOLLOW)
+
+**The `gain` and `loss` colors in theme.json DEFINE the up/down color mapping for the ENTIRE report.**
+This is the single most important rule — violating it breaks the user's visual preference.
+
+### Mandatory color mapping
+
+Read `theme.json` → use `gain` and `loss` values to populate ALL of the following:
+
+| Theme key | CSS class / SVG usage | Meaning |
+|---|---|---|
+| `theme.gain` | `.up { color: <gain>; }` | 上涨的颜色 |
+| `theme.gain` | `.bar-fill.up { background: <gain>; }` | 领涨板块柱 |
+| `theme.gain` | SVG line: `stroke="<gain>"` when net up | 上涨走势线 |
+| `theme.gain` | SVG area fill: `rgba(R,G,B,0.08)` from gain hex | 上涨区域填充 |
+| `theme.gain` | K-line yang body (close >= open): `fill="<gain>"` | 阳线实体 |
+| `theme.loss` | `.down { color: <loss>; }` | 下跌的颜色 |
+| `theme.loss` | `.bar-fill.down { background: <loss>; }` | 领跌板块柱 |
+| `theme.loss` | SVG line: `stroke="<loss>"` when net down | 下跌走势线 |
+| `theme.loss` | SVG area fill: `rgba(R,G,B,0.08)` from loss hex | 下跌区域填充 |
+| `theme.loss` | K-line yin body (close < open): `fill="<loss>"` | 阴线实体 |
+
+### K-line description text MUST match theme
+
+The K-line chart footnote MUST reflect the actual colors in use:
+- If gain=red(#dc2626), loss=green(#16a34a): write "红实体为收盘高于开盘（阳线），绿实体为收盘低于开盘（阴线）"
+- If gain=green(#16a34a), loss=red(#dc2626): write "绿实体为收盘高于开盘（阳线），红实体为收盘低于开盘（阴线）"
+
+### SVG area fill color conversion
+
+When converting a hex color to RGBA for SVG area fills:
+- `#dc2626` → `rgba(220,38,38,0.08)`
+- `#16a34a` → `rgba(22,163,74,0.08)`
+- `#2563eb` → `rgba(37,99,235,0.08)`
+
+### Verification checklist (MUST run before Phase 3 PDF render)
+
+After generating the HTML, verify these rules are met:
+
+1. **CSS check:** `.up` uses `theme.gain`, `.down` uses `theme.loss`
+2. **Bar chart check:** `.bar-fill.up` background uses `theme.gain`, `.bar-fill.down` background uses `theme.loss`
+3. **Line chart check:** SVG polyline stroke uses `theme.gain` for net-up indices, `theme.loss` for net-down indices
+4. **K-line check:** Yang candle fill uses `theme.gain`, Yin candle fill uses `theme.loss`
+5. **K-line footnote:** Text matches the actual color mapping (red=yang, green=yin OR green=yang, red=yin)
+6. **Callout check:** `.callout.bullish` border-left-color uses `theme.gain`, `.callout.bearish` border-left-color uses `theme.loss`
+
+If ANY of these checks fail, fix the HTML and re-verify before rendering PDF.
+Never ship a report where these color rules are violated.
 
 **Font stack (Chinese-friendly, works in wkhtmltopdf QtWebKit):**
 ```css
@@ -80,9 +129,8 @@ font-family: "Microsoft YaHei", "SimHei", "PingFang SC", "Hiragino Sans GB", san
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: "Microsoft YaHei", "SimHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
-  color: #334155; background: #ffffff; max-width: 860px;
+  color: #334155; background: #ffffff; max-width: 800px;
   margin: 0 auto; padding: 48px 40px; line-height: 1.8;
-  /* wider body (860px) gives K-line charts more room when stacked vertically */
   /* AI-generated background texture (4% opacity, barely visible when printed) */
   background-image: url('../assets/decorations/bg-texture.png');
   background-repeat: repeat;
@@ -137,15 +185,10 @@ strong { color: #0f172a; }
 
 /* ===== Line & K-line charts (SVG) ===== */
 .line-section, .kline-section { margin: 20px 0; }
-.line-charts-grid { display: flex; flex-wrap: wrap; gap: 16px; margin: 16px 0; }
-.line-chart-card { flex: 1; min-width: 220px; background: #f8fafc;
-                   border: 1px solid #e2e8f0; border-radius: 8px;
-                   padding: 14px 12px 8px 12px; }
-/* K-line charts: vertical stack (one per row) for larger, more readable candles */
-.kline-charts-grid { display: flex; flex-direction: column; gap: 20px; margin: 16px 0; }
-.kline-chart-card { width: 100%; background: #f8fafc;
-                    border: 1px solid #e2e8f0; border-radius: 8px;
-                    padding: 14px 12px 8px 12px; }
+.line-charts-grid, .kline-charts-grid { display: flex; flex-wrap: wrap; gap: 16px; margin: 16px 0; }
+.line-chart-card, .kline-chart-card { flex: 1; min-width: 220px; background: #f8fafc;
+                                      border: 1px solid #e2e8f0; border-radius: 8px;
+                                      padding: 14px 12px 8px 12px; }
 .line-chart-card .chart-title, .kline-chart-card .chart-title { font-size: 14px;
     font-weight: 700; color: #0f172a; margin-bottom: 2px; text-align: center; }
 .line-chart-card .chart-subtitle, .kline-chart-card .chart-subtitle { font-size: 11px;
@@ -188,22 +231,6 @@ strong { color: #0f172a; }
 /* ===== Page layout ===== */
 .page-break { page-break-before: always; }
 hr { border: none; border-top: 1px solid #e2e8f0; margin: 40px 0 16px 0; }
-
-/* ===== PDF page-break control ===== */
-/* Prevent content from breaking in the middle of key blocks.
-   Essential for clean PDF output via Playwright/wkhtmltopdf. */
-h2 { page-break-before: auto; page-break-after: avoid; }
-h3 { page-break-after: avoid; }
-.data-table { page-break-inside: avoid; }
-.kline-chart-card { page-break-inside: avoid; }
-.knowledge-card { page-break-inside: avoid; }
-.callout { page-break-inside: avoid; }
-.metric-row { page-break-inside: avoid; }
-.summary-box { page-break-inside: avoid; }
-.pull-quote { page-break-inside: avoid; }
-.bar-section { page-break-inside: avoid; }
-ul { page-break-inside: avoid; }
-.report-header { page-break-after: avoid; }
 
 /* ===== Footer ===== */
 .report-footer { margin-top: 48px; padding-top: 16px;
@@ -260,9 +287,9 @@ For data point i:
   y = margin_top + (1 - (close[i] - min_price) / price_range) * chart_height
 ```
 
-Line color rule:
-- If last close >= first close: green (#16a34a)
-- If last close < first close: red (#dc2626)
+Line color rule (USE theme.json `gain` and `loss` values):
+- If last close >= first close (net up): use `theme.gain` color for the line stroke
+- If last close < first close (net down): use `theme.loss` color for the line stroke
 
 ```html
 <div class="line-section">
@@ -343,9 +370,9 @@ For HK and A-shares, use separate cards (indices have very different scales).
 K-line charts show OHLC (Open/High/Low/Close) for each trading day, giving richer
 information than line charts. Each "candle" shows the day's price range and direction.
 
-Color convention (match report colors):
-- Yang (close >= open): green body `#16a34a`
-- Yin (close < open): red body `#dc2626`
+Color convention (USE theme.json `gain` and `loss` values):
+- Yang (close >= open): use `theme.gain` for body and wick
+- Yin (close < open): use `theme.loss` for body and wick
 
 SVG coordinate calculation:
 ```
@@ -370,7 +397,7 @@ For candle i:
   body_top = Math.min(open_y, close_y)
   body_h = Math.max(Math.abs(close_y - open_y), 1)  // minimum 1px for doji
   is_yang = close[i] >= open[i]
-  color = is_yang ? "#16a34a" : "#dc2626"
+  color = is_yang ? theme.gain : theme.loss  // use theme.json values, NOT hardcoded
 ```
 
 ```html
@@ -616,6 +643,8 @@ Watchlist: <ticker: price, change%, headline> (if any)
 
 ### Phase 2 -- HTML Report Generation
 
+> **排版一致性（强制）：** 生成 HTML 前，先读取工作目录或 `output/` 目录下最近一份历史报告 HTML（如 `美股日报_*.html`、`report_*.html`），对齐其板块顺序与 HTML 结构（metric-row 指标卡、summary-box 卡片概览、data-table 明细表、K线图等）。`templates/us-stock.md` 已固化标准版式，务必逐节对照执行，确保每天报告排版与往期基本一致。
+
 Read the template file from `templates/`. Each section has a `chart:` tag
 that determines the output format:
 
@@ -679,9 +708,6 @@ Refer to `trackers/knowledge-tracker.md` to find the last topic covered, then pi
 
 ### Phase 3 -- PDF Output & Record
 
-**Output location: Save all generated files (HTML and PDF) to the user's current
-working directory (the folder they have open), NOT the skill directory.**
-
 **Step 1: Ensure Playwright + Chromium are available.**
 
 Default PDF renderer: Playwright with headless Chromium (supports modern CSS,
@@ -733,6 +759,27 @@ Append one line to `trackers/knowledge-tracker.md`:
 ```
 | <YYYY-MM-DD> | 金融: <concept> (#<N>) | 股市: <tip> (#<M>) |
 ```
+
+**Step 6: Auto-open PDF with default viewer.**
+
+After the PDF is generated and trackers are updated, automatically open the PDF using the user's default PDF viewer:
+
+Windows:
+```bash
+start "" "<PDF路径>"
+```
+
+macOS:
+```bash
+open "<PDF路径>"
+```
+
+Linux:
+```bash
+xdg-open "<PDF路径>"
+```
+
+This saves the user from having to manually locate and open the file.
 
 ### Market auto-detection (no parameter)
 

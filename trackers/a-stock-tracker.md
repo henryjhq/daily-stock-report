@@ -38,3 +38,4 @@ the date, Shanghai/Shenzhen index moves, Northbound flow, and a theme tag.
 - Consumer recovery (消费复苏) post-COVID
 - 中特估 (SOE revaluation) and dividend plays
 - Small-cap vs blue-chip (沪深300 vs 中证2000)
+| 2026-07-18 | 上证 -3.05% / 深证 -5.40% | 北向成交 3935亿 | 极端冰点 双创跌逾7% |
